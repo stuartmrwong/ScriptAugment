@@ -21,18 +21,17 @@ def remove_comment(line, finish):
     line = line[0: finish] #remove the comment by slicing the string with the index of the start to the #
     return line
                   
-def add_comment():
-    line = str('#')
-    return line
-
 def create_noise(length, chars):
     return '#' + ''.join(random.choices(chars, k=length)) + '\n'
+
+def create_noiseAlpha(length, chars):
+    return ''.join(random.choices(chars, k=length))
         
 def add_remove_line(line):
     d20 = random.randint(1,20) #random integer between 1 and 20, not crypto secure
-    if d20 <= 2: #20% chance to add a line
+    if d20 <= 5: #25% chance to add a line
         line = line + '\n'
-    if d20 >=19: #20% chance to strip the line
+    if d20 >=15: #25% chance to strip the line
         line = line.strip()
     else:
         pass
@@ -43,6 +42,10 @@ def file_length(filename): #this function will calculate the number of lines
         for i, l in enumerate(f): #start a for loop that counts each line
             pass #do nothing
     return i + 1 #the function returns the number of lines + 1 because 0 counts
+
+#string.punctuation without '=' because it confuses with variables
+Noise = string.punctuation
+Noise = Noise.replace('=', '')
 
 """
     the function to replace comments goes here
@@ -65,6 +68,7 @@ if os.path.exists(Truefile): #check that the file 'a' actually exists
     c.close()
     Newcode = '' #this will hold our new, obfuscated code
     
+    #calculating the splitting of the program into 4 quarter blocks
     quarter = Totallines / 4
     quarter = int(quarter)
     half = quarter * 2
@@ -88,29 +92,36 @@ if os.path.exists(Truefile): #check that the file 'a' actually exists
     #print(CodeDict) #print CodeDict just so I can see that it works
     #print(CodeDict[1]) #proving I can call specific key value pairs
     
-    #START BLOCK 1
-    #scanning through the first block(25% of the code)
-    for i in range(0, threequarter): 
+    #START BLOCK 1-4 THIS IS THE MAIN PROGRAM
+    #scanning through the first block(100% of the code)
+    for i in range(0, Totallines): 
         
         #if you find a shebang, dont do anything 
         if CodeDict[i].find('#!') >= 0: 
-            print('Shebang found')
+            print('Shebang found in line ' + str(i + 1) + ', will do nothing')
             Newcode += CodeDict.get(i)
             pass           
         
         #if we find a comment, delete the comment, write a new comment
         elif CodeDict[i].find('#') >= 0: 
             CommentLocation = CodeDict[i].find('#')                    #acquire the location of the #                    
-            print('Comment Detected in line ' + str(i) + ' at character ' + str(CommentLocation))
+            print('Comment Detected in line ' + str(i +1 ) + ' at character ' + str(CommentLocation))
             CodeDict[i] = remove_comment(CodeDict[i], CommentLocation) #slice out the comment and leave anything else
-            print('Creating new line: ' + str(CodeDict.get(i)))        #get the new, sliced line                  
-            Newcode += CodeDict.get(i) + str(create_noise(30, string.ascii_letters + string.digits + string.punctuation))            #add a comment back in because there was one before
+            print('Creating new line: ' + str(CodeDict.get(i)))        #get the new, sliced line  
+            Randomlength = random.randint(1, 100)                                    
+            Newcode += CodeDict.get(i) + str(create_noise(Randomlength, string.ascii_letters + string.digits + Noise))            #add a comment back in because there was one before
         
-        #if we find an empty line, randomly add another or delete it
-        elif '\n' in CodeDict[i] == True:
-            print('\n>>>new line detected. calculating to add or delete')
+        #if we find a TRULY empty line, randomly add another or delete it
+        elif CodeDict[i] == '\n':
+            print('Empty line detected in line ' + str(i + 1) + ', calculating to add or delete')
             CodeDict[i] = add_remove_line(CodeDict[i])
-            print(CodeDict[i])
+            Newcode += CodeDict.get(i)
+            
+        #if we find a empty line but it contains white space, randomly add another or delete it    
+        elif len(CodeDict[i].strip()) == 0:
+            print('Empty line with whitespace detected in line ' + str(i + 1) + ', calculating to add or delete')
+            CodeDict[i] = add_remove_line(CodeDict[i])
+            Newcode += CodeDict.get(i)  
             
         #if its something we dont recognize, leave it to ensure functionality
         else:
@@ -118,44 +129,49 @@ if os.path.exists(Truefile): #check that the file 'a' actually exists
             Newcode += CodeDict.get(i)
             pass
             
-    print('END OF BLOCK 1')
+    print('END OF BLOCK 1-4')
     print('New code: ')
     print(Newcode)
-    #END OF BLOCK 1
-    """
-    #scanning through the second block(25% - 50% of the code)
-    for i in range(quarter, half): 
-               
-        #if we find a comment, delete the comment, write a new comment
-        if CodeDict[i].find('#') >= 0: 
-            CommentLocation = CodeDict[i].find('#')                    #acquire the location of the #                    
-            print('Comment Detected in line ' + str(i) + ' at character ' + str(CommentLocation))
-            CodeDict[i] = remove_comment(CodeDict[i], CommentLocation) #slice out the comment and leave anything else
-            print('Creating new line: ' + str(CodeDict.get(i)))        #get the new, sliced line                  
-            Newcode += CodeDict.get(i) + str(create_noise(30, string.ascii_letters + string.digits + string.punctuation))            #add a comment back in because there was one before
-            
-        elif '\n' in CodeDict[i] == True:
-            print('\n>>>new line detected. calculating to add or delete')
-            CodeDict[i] = add_remove_line(CodeDict[i])
-            print(CodeDict[i])
-        
-        else:
-            print(CodeDict[i])
-            pass
-            
-    print('END OF BLOCK 2')
-    print('New code: ')
-    print(Newcode)
-    #END OF BLOCK 2
-    """
-    with open(Editfile, 'w') as Nc:
-        Nc.write(Newcode)
-        
+    #END OF BLOCK 1-4
     
-    """
-    for i in range(quarter, half): #printing the second block
-        print(CodeDict[i])
-    """
+    #write all the new code to the new file
+    with open(Editfile, 'w') as Nc:
+        Nc.write(Newcode) 
+    
+    #pattern matching variables off the Newcode string
+    
+    VariableList = re.findall(r'\s*([a-zA-Z][a-zA-Z0-9_]*)\s*=\s*.', Newcode) #it returns whatever is in the (), and matches everything
+    print('Found these variables: ' + str(VariableList) + ' We Will replace them')
+
+
+    for n, i in enumerate(VariableList):
+        x = str(create_noiseAlpha(10, string.ascii_letters)) + str(create_noiseAlpha(10, string.ascii_letters + string.digits))
+        Newcode = Newcode.replace(i,x)
+        print('Replacing variable: ' + i + ' with: ' + x)
+        """
+    for n, i in enumerate(VariableList):
+        
+        TempList = re.findall(r'\s*\W\s*' + i + '\s*\W.', Newcode)
+        print(TempList)
+        for m, k in enumerate(TempList):
+            x = str(create_noiseAlpha(10, string.ascii_letters)) + str(create_noiseAlpha(10, string.ascii_letters + string.digits))
+            y = k+''
+            y = y.replace(i,x)
+            
+            Newcode = Newcode.replace(k,y)
+            print('i='+i)
+            print('k='+k)
+            print('x='+x)
+            print('y='+y)
+            print('Replacing variable: ' + k + ' with: ' + x)
+        
+        """    
+    print(Newcode)    
+    with open(Editfile, 'w') as Nc:
+        Nc.write(Newcode) 
+        
+#c:\users\stuart\desktop\test.py    
+
     
     
     
