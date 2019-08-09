@@ -2,6 +2,7 @@
 The user inputs a path to a python file. ScriptAugment outputs a new file that runs exactly the same as the original input file but any sense of authorship is destroyed.
 
 Given a input path to a .py file:
+
 0. Ensure the output file executes exactly the same as the input file
 1. Change the total number of lines
 2. Change all comments
