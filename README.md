@@ -12,6 +12,7 @@ Given a input path to a .py file:
 7. Replace similar objects
 
 The output file should be:
+
 0. Work completely as the input code intended
 0. Complete obfuscation of authorship
 1. Extremely difficult to understand 
