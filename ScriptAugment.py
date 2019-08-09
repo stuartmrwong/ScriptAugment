@@ -52,7 +52,7 @@ Noise = Noise.replace('=', '')
 """
 
 print('name of file, including directory') #ask user for the file to edit
-Truefile = input() #save the file as variable 'a'
+Truefile = input() #save the file as variable 
 
 if os.path.exists(Truefile): #check that the file 'a' actually exists
     Editfile = shutil.copyfile(Truefile, str(Truefile[0:-3]) + 'edit.py') #create a copy and name it 'file'+'edit'
@@ -91,8 +91,13 @@ if os.path.exists(Truefile): #check that the file 'a' actually exists
             CodeDict.setdefault(count, line) #add each line as key and code as value to the empty dictionary CodeDict
     #print(CodeDict) #print CodeDict just so I can see that it works
     #print(CodeDict[1]) #proving I can call specific key value pairs
-    
+# =============================================================================
+# =============================================================================
+# #     
+# =============================================================================
+# =============================================================================
     #START BLOCK 1-4 THIS IS THE MAIN PROGRAM
+    #dealing with shebangs, comments, and empty lines
     #scanning through the first block(100% of the code)
     for i in range(0, Totallines): 
         
@@ -137,17 +142,22 @@ if os.path.exists(Truefile): #check that the file 'a' actually exists
     #write all the new code to the new file
     with open(Editfile, 'w') as Nc:
         Nc.write(Newcode) 
-    
+# =============================================================================
+# =============================================================================
+# #     
+# =============================================================================
+# =============================================================================
+    #dealing with variables
     #pattern matching variables off the Newcode string
     
     VariableList = re.findall(r'\s*([a-zA-Z][a-zA-Z0-9_]*)\s*=\s*.', Newcode) #it returns whatever is in the (), and matches everything
-    print('Found these variables: ' + str(VariableList) + ' We Will replace them')
+    print('Found these variables: ' + str(VariableList) + ' We will replace them')
 
 
     for n, i in enumerate(VariableList):
-        x = str(create_noiseAlpha(10, string.ascii_letters)) + str(create_noiseAlpha(10, string.ascii_letters + string.digits))
+        x = str(create_noiseAlpha(1, string.ascii_letters)) + str(create_noiseAlpha(Randomlength, string.ascii_letters + string.digits))
         Newcode = Newcode.replace(i,x)
-        print('Replacing variable: ' + i + ' with: ' + x)
+        print('Replacing variable: \'' + i + '\' with: ' + x)
         """
     for n, i in enumerate(VariableList):
         
@@ -166,7 +176,7 @@ if os.path.exists(Truefile): #check that the file 'a' actually exists
             print('Replacing variable: ' + k + ' with: ' + x)
         
         """    
-    print(Newcode)    
+    print('\nThis is the new code \n\n' + Newcode)    
     with open(Editfile, 'w') as Nc:
         Nc.write(Newcode) 
         
