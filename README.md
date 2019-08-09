@@ -17,4 +17,4 @@ The output file should be:
 0. Work completely as the input code intended
 0. Complete obfuscation of authorship
 1. Extremely difficult to understand 
-2. Comlpetely obvious that an attempt was made to non-surreptitiously obfuscate authorship
+2. Completely obvious that an attempt was made to non-surreptitiously obfuscate authorship
